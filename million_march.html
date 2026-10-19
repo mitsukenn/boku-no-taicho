@@ -131,6 +131,10 @@ gtag('config', 'G-740PJ5K47G');
   .story-text.on{opacity:1}
   .story-ui{position:absolute; left:0; right:0; bottom:6%; display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap}
   .story-ui .howto-link{color:rgba(255,255,255,.75)}
+
+  .talk-theme{font-size:clamp(20px,3.4vw,30px); font-weight:700; line-height:1.5; margin:8px 0 10px; color:#ffe9b8}
+  .talk-timer{display:flex; align-items:center; justify-content:center; gap:14px; margin:6px 0 10px}
+  .talk-timer span{font:700 34px/1 "Barlow Semi Condensed", sans-serif; letter-spacing:.04em; min-width:4ch; text-align:center}
   .ov{
     position:absolute; inset:0;
     display:flex; flex-direction:column;
@@ -628,6 +632,20 @@ gtag('config', 'G-740PJ5K47G');
       <button class="btn" id="storyStart">▶ ものがたりをはじめる</button>
       <button class="btn ghost" id="storyNext" hidden>つぎへ</button>
       <button class="howto-link" id="storySkip">とばす</button>
+    </div>
+  </div>
+
+  <div class="ov" id="ovTalk" hidden>
+    <div class="tablet">
+      <div class="eyebrow">トークタイム</div>
+      <h2 id="talkTitle">長崎の未来を考えよう</h2>
+      <p class="talk-theme" id="talkTheme"></p>
+      <p class="lede" id="talkHint"></p>
+      <div class="talk-timer"><span id="talkClock">3:00</span><button class="btn ghost" id="talkStart">3分はかる</button></div>
+      <p class="lede">まわりの人と話してみよう。答えはひとつじゃない。</p>
+      <div class="btn-row">
+        <button class="btn" id="talkNext">話したら、つぎのステージへ</button>
+      </div>
     </div>
   </div>
   <div class="ov" id="ovTitle">
@@ -4099,7 +4117,44 @@ addEventListener("keydown", (e) => {
 document.addEventListener("visibilitychange", () => { if (document.hidden) pauseGame(); });
 
 document.getElementById("btnStart").addEventListener("click", () => { Snd.kick(); showMap(); });
+
+/* ===== トークタイム（イベント用）=====
+   2・4・6・8面をクリアして次へ進むとき、長崎の未来を考えるお題を出す。ボーナス面・エンドレスでは出さない */
+const TALKS = [
+  ["長崎にもっと人が来るには、何があったらいい？", "ヒント：きみが友だちを長崎に呼ぶなら、どこに連れていく？"],
+  ["100年後も残したい、長崎のものは？", "ヒント：建物、食べもの、お祭り、景色。ひとつ選ぶなら？"],
+  ["長崎の海で、未来にどんな仕事ができる？", "ヒント：船をつくる、風で電気をつくる、海の中を調べる。ほかには？"],
+  ["坂や階段が多い長崎。みんなが楽に暮らすには？", "ヒント：おじいちゃん・おばあちゃんや、ベビーカーの人のことも考えてみよう"],
+  ["外国から来た人に、長崎の何を見せたい？", "ヒント：長崎は昔から、外国の人をむかえてきたまち"],
+  ["きみが大人になったとき、長崎でどんな仕事をしたい？", "ヒント：いまはまだ無い仕事でもいい"],
+  ["新しい長崎名物をつくるなら、どんなもの？", "ヒント：カステラもちゃんぽんも、昔はだれかが考えた新しいものだった"],
+];
+const Talk = (() => {
+  const ov = document.getElementById("ovTalk"), theme = document.getElementById("talkTheme"), hint = document.getElementById("talkHint");
+  const clock = document.getElementById("talkClock"), bStart = document.getElementById("talkStart"), bNext = document.getElementById("talkNext");
+  let after = null, timer = 0, left = 180;
+  function paint() { clock.textContent = Math.floor(left / 60) + ":" + String(left % 60).padStart(2, "0"); }
+  function stopTimer() { clearInterval(timer); timer = 0; }
+  function show(st, cont) {
+    const idx = Math.floor((st - 1) / 2) % TALKS.length;
+    const t = TALKS[(idx + (store.get("mm.talkOffset", 0) | 0)) % TALKS.length];
+    theme.textContent = t[0]; hint.textContent = t[1];
+    left = 180; paint(); stopTimer(); bStart.disabled = false; bStart.textContent = "3分はかる";
+    after = cont; ov.hidden = false;
+  }
+  bStart.addEventListener("click", () => {
+    if (timer) return;
+    bStart.textContent = "はかっています";
+    timer = setInterval(() => { left = Math.max(0, left - 1); paint(); if (!left) { stopTimer(); bStart.textContent = "3分たった！"; Snd.great(); vib(60); } }, 1000);
+  });
+  bNext.addEventListener("click", () => { stopTimer(); ov.hidden = true; const f = after; after = null; if (f) f(); });
+  /** 出すかどうか：通常面の2・4・6・8をクリアしたあと */
+  const due = (st) => !inBonus && !!mapRun && st % 2 === 0 && st < FINAL_STAGE;
+  return { show, due };
+})();
+
 document.getElementById("btnNext").addEventListener("click", () => {
+  if (Talk.due(stage)) { const st = stage; ovClear.hidden = true; Talk.show(st, () => startNode(st + 1)); return; }
   if (inBonus || !mapRun) { showMap(); return; }
   if (stage >= FINAL_STAGE) {                      // エンドレスは続けて次の面へ
     beginStage(stage + 1, Math.max(10, Math.round(crowd.count)), crowd.weapon);
