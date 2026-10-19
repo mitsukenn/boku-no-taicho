@@ -634,6 +634,7 @@ gtag('config', 'G-740PJ5K47G');
     <div class="tablet">
       <div class="eyebrow">数で巨人を倒せ</div>
       <h1>長崎クエスト</h1>
+      <p class="tag-line" id="heroLine" hidden></p>
       <p class="tag-line">ゲートをくぐって、<br>軍勢を100万へ。</p>
       <div class="records" id="records" hidden></div>
       <div class="btn-row">
@@ -683,7 +684,7 @@ gtag('config', 'G-740PJ5K47G');
   <div class="ov" id="ovWin" hidden>
     <div class="tablet">
       <div class="eyebrow">Stage 10 — 完全制覇</div>
-      <h1 style="font-size:clamp(28px,6vw,42px)">神殿は落ちた</h1>
+      <h1 style="font-size:clamp(28px,6vw,42px)" id="winTitle">神殿は落ちた</h1>
       <p class="lede">10の神殿すべてを制圧した。この先は終わりのない遠征。どこまで進めるか試してみよう。</p>
       <div class="stats">
         <div class="stat"><div class="k">最終兵力</div><div class="v" id="wArmy">0</div></div>
@@ -700,7 +701,7 @@ gtag('config', 'G-740PJ5K47G');
   <div class="ov" id="ovOver" hidden>
     <div class="tablet">
       <div class="eyebrow">全滅</div>
-      <h2 class="lose">軍勢は尽きた</h2>
+      <h2 class="lose" id="overTitle">軍勢は尽きた</h2>
       <p class="lede" id="overLede">数で押し負けた。ゲートの選び方を変えてみよう。</p>
       <div class="stats">
         <div class="stat"><div class="k">到達</div><div class="v" id="oStage">1</div></div>
@@ -1960,7 +1961,7 @@ function syncUnits(host, palDeath) {
   if (host === crowd) crowd.back = Math.max(0, 0.4 * Math.sqrt(ranks.length + 0.5) * 1.45 * host.spacing - 1.0);
   if (host === crowd) {
     if (top > (crowd.topRank | 0) && (state === "run" || state === "battle") && RANK_NAME[top]) {
-      popText(RANK_NAME[top] + " 結成!", C.gold, crowd.z + 4, true);
+      popText((HERO_NAME ? HERO_NAME + "の" : "") + RANK_NAME[top] + " 結成!", C.gold, crowd.z + 4, true);
       addFx("fx_spark", crowd.x, 2, crowd.z + 1, 3, 0.6, 1.6);
       Snd.great();
     }
@@ -1980,6 +1981,8 @@ function setCount(n) {
 /* ===== 落書きの隊長（イベント用）=====
    event/index.html で取り込んだ落書き（白を抜いた PNG の dataURL）を localStorage から読み、
    先頭の兵と「隊長」の段の兵を、その絵で描く。2コマ目は少し傾けて歩いているように見せる */
+const HERO_NAME = (() => { try { return (localStorage.getItem("ev:hero.name") || "").trim().slice(0, 8); } catch (e) { return ""; } })();
+const heroCall = () => (HERO_NAME ? HERO_NAME + "隊長" : "隊長");
 const Hero = (() => {
   let frames = null, aspect = 1;
   const url = (() => { try { return localStorage.getItem("ev:hero") || ""; } catch (e) { return ""; } })();
@@ -3211,7 +3214,7 @@ function eatFood(it) {
   it.got = 1;
   const before = crowd.count;
   setCount(Math.max(before + 3, Math.round(before * (1 + FOOD_BONUS))));
-  popText(it.food.name + "！ +" + fmt(crowd.count - before), C.gold, it.z, true);
+  popText((Math.random() < 0.5 ? heroCall() + "、" : "") + it.food.name + "！ +" + fmt(crowd.count - before), C.gold, it.z, true);
   const got = foodsGot(); got[it.food.id] = (got[it.food.id] || 0) + 1; store.set("mm.foods", got);
   for (let i = 0; i < 16; i++) puff(it.x + rnd(-.5, .5), rnd(.6, 1.6), it.z, C.gold, 1);
   addFx("fx_spark", it.x, 1.4, it.z, 1.6, 0.5, 1.2);
@@ -3794,6 +3797,7 @@ const hWeap  = document.getElementById("hWeap");
 const hPow   = document.getElementById("hPow");
 const hBar   = document.getElementById("hBar");
 const ovTitle = document.getElementById("ovTitle");
+if (HERO_NAME) { const hl = document.getElementById("heroLine"); hl.textContent = HERO_NAME + "隊長、準備はいいか。"; hl.hidden = false; }
 if (!Hero.has && !location.search.includes("nohero")) location.replace("index.html");
 const ovClear = document.getElementById("ovClear");
 const ovOver  = document.getElementById("ovOver");
@@ -3918,6 +3922,7 @@ function beginStage(st, army, weapon) {
   if (st === 5) { showBanner("STAGE 5", place + " ─ ここからが本番", "hard"); Snd.fanfare5(); }
   else if (st > FINAL_STAGE) showBanner("STAGE " + st, place + " ─ エンドレス遠征");
   else showBanner("STAGE " + st, st === 1 ? place + " ─ 進め、進め！" : place);
+  setTimeout(() => { if (state === "run") popText(heroCall() + "、出撃！", C.gold, crowd.z + 6, true); }, 900);
   tutStage();
 }
 
@@ -3967,13 +3972,14 @@ function stageClear() {
     Result.hideClearShare();
     return;
   }
-  document.getElementById("clearTitle").textContent = "神殿を制圧した";
+  document.getElementById("clearTitle").textContent = heroCall() + "、神殿を制圧！";
   document.getElementById("btnNext").textContent = "次のステージへ";
   document.getElementById("clearLede").textContent = foodsSummary();
 
   if (stage >= FINAL_STAGE && !endless) {          // 完全制覇
     recordClear(rankNow());
     store.set("mm.save", { st: stage + 1, army: Math.max(10, Math.round(crowd.count)), weapon: crowd.weapon, kills, endless: true, rb: runBest });
+    document.getElementById("winTitle").textContent = heroCall() + "、神殿は落ちた";
     document.getElementById("wArmy").textContent  = fmt(crowd.count);
     document.getElementById("wWeap").textContent  = wname(crowd.weapon);
     document.getElementById("wKills").textContent = fmt(kills);
@@ -4007,6 +4013,7 @@ function gameOver() {
     ? "宝物庫をとってあるなら、今が使いどき。マップから遊べる。"
     : ["数で押し負けた。ゲートの選び方を変えてみよう。", "前の面を遊び直して兵を増やしてから挑むのも手。マップから選べる。",
        "金のゲートで武器を上げると、同じ兵力でも戦闘力が上がる。"][(Math.random() * 3) | 0];
+  document.getElementById("overTitle").textContent = heroCall() + "、軍勢は尽きた";
   document.getElementById("oStage").textContent = "Stage " + stage;
   document.getElementById("oKills").textContent = fmt(kills);
   document.getElementById("oBest").textContent = fmt(best);
@@ -4858,6 +4865,7 @@ if (document.fonts && document.fonts.load) {
 <script>
 /* オープニング：背景を切り替えながらナレーションを流す。index.html で新しい隊長を取り込むたびに ev: が消えるので、子ども1人につき1回見る */
 (() => {
+  const HERO_NAME = (() => { try { return (localStorage.getItem("ev:hero.name") || "").trim().slice(0, 8); } catch (e) { return ""; } })();   // 本体の HERO_NAME は別スクリプトの中なので、ここでも読む
   const SCENES = [
     ["nagasaki_01_meganebashi", "いまから450年前。長崎は、海と山にはさまれた、小さな村でした。"],
     ["nagasaki_02_dejima", "船に乗って、遠い国からたくさんの人がやってきました。日本で外国とつながる港は、長崎だけ。カステラも、ちゃんぽんも、ガラスも、ここから日本中に広まったのです。"],
@@ -4865,7 +4873,7 @@ if (document.fonts && document.fonts.load) {
     ["nagasaki_04_gunkanjima", "船を作る技、海の底から石炭をほる技。長崎の人の手が、日本を動かしてきました。"],
     ["nagasaki_03_inasayama", "そしていま。この光のひとつひとつが、長崎で働く人たち、長崎で暮らす家族です。"],
     ["nagasaki_08_tram", "でも、長崎の人は、少しずつ減っています。このまちの次の450年は、だれが作るのでしょう。"],
-    ["nagasaki_05_glover", "きみが描いた隊長といっしょに、長崎のまちを進みましょう。カステラを拾い、仲間を集め、まだ見たことのない長崎へ。未来の長崎を作るのは、きみです。"],
+    ["nagasaki_05_glover", (HERO_NAME ? HERO_NAME + "隊長" : "きみが描いた隊長") + "といっしょに、長崎のまちを進みましょう。カステラを拾い、仲間を集め、まだ見たことのない長崎へ。未来の長崎を作るのは、きみです。"],
   ];
   const ov = document.getElementById("ovStory"), bgs = [document.getElementById("storyBg"), document.getElementById("storyBg2")];
   const txt = document.getElementById("storyText"), bStart = document.getElementById("storyStart"), bNext = document.getElementById("storyNext"), bSkip = document.getElementById("storySkip");

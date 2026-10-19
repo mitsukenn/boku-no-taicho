@@ -25,6 +25,8 @@
   .warn { color: #a32d2d; font-size: 14px; margin: 0 0 8px; min-height: 1.4em; }
   .note { font-size: 13px; color: #5f5e5a; margin-top: 6px; }
   .row { display: flex; gap: 8px; }
+  .name-row { display: block; font-size: 14px; color: #5f5e5a; margin: 0 0 10px; }
+  .name-row input { display: block; width: 100%; box-sizing: border-box; margin-top: 4px; font-size: 20px; padding: 10px 12px; border: 0.5px solid #b4b2a9; border-radius: 8px; }
   .row .btn { width: auto; flex: 1; }
 </style>
 </head>
@@ -50,6 +52,7 @@
     <h2>3. できあがり</h2>
     <div class="preview" id="preview"><div class="road"></div><div class="empty" id="empty">ここに隊長が出ます</div></div>
     <p class="warn" id="warn"></p>
+    <label class="name-row">隊長の名前（8文字まで）<input id="heroName" type="text" maxlength="8" placeholder="たとえば：たろう" autocomplete="off"></label>
     <div class="row">
       <button class="btn" id="btnPlay" type="button" disabled>この隊長で出発</button>
     </div>
@@ -155,8 +158,9 @@
 
   btnPlay.addEventListener("click", () => {
     if (!heroUrl) return;
+    const name = (document.getElementById("heroName").value || "").trim().slice(0, 8);
     clearEventSaves();
-    try { localStorage.setItem(KEY, heroUrl); } catch (e) { warn.textContent = "この端末には保存できませんでした"; return; }
+    try { localStorage.setItem(KEY, heroUrl); localStorage.setItem("ev:hero.name", name); } catch (e) { warn.textContent = "この端末には保存できませんでした"; return; }
     location.href = "million_march.html";
   });
 })();
