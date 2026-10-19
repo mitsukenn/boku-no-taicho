@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#241c18">
+<title>ぼくの隊長（試作）</title>
+<style>
+  :root { color-scheme: light; }
+  body { margin: 0; font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif; background: #faf9f5; color: #141413; }
+  main { max-width: 480px; margin: 0 auto; padding: 20px 16px 48px; }
+  h1 { font-size: 26px; margin: 8px 0 4px; }
+  .lead { color: #5f5e5a; margin: 0 0 20px; }
+  .step { background: #fff; border: 0.5px solid #d3d1c7; border-radius: 12px; padding: 16px; margin: 0 0 14px; }
+  .step h2 { font-size: 17px; margin: 0 0 8px; }
+  .step p { margin: 0 0 10px; }
+  .btn { display: inline-block; width: 100%; box-sizing: border-box; text-align: center; font-size: 18px; font-weight: 600; padding: 14px 16px; border-radius: 10px; border: 0; cursor: pointer; background: #ff9a2e; color: #2b1a05; }
+  .btn.sub { background: #f1efe8; color: #444441; font-weight: 500; font-size: 15px; padding: 11px; margin-top: 8px; }
+  .btn[disabled] { opacity: .45; cursor: default; }
+  input[type=file] { display: none; }
+  .preview { position: relative; height: 240px; border-radius: 10px; background: #2a3a30 url("assets/backgrounds/map_unknown.webp") center/cover; display: flex; align-items: flex-end; justify-content: center; overflow: hidden; margin: 0 0 10px; }
+  .preview canvas { max-height: 200px; max-width: 80%; margin-bottom: 18px; filter: drop-shadow(0 6px 6px rgba(0,0,0,.35)); }
+  .preview .road { position: absolute; left: 0; right: 0; bottom: 0; height: 26px; background: linear-gradient(#6c6358, #4b4339); }
+  .preview .empty { color: #cfd6c9; font-size: 15px; margin-bottom: 100px; }
+  .warn { color: #a32d2d; font-size: 14px; margin: 0 0 8px; min-height: 1.4em; }
+  .note { font-size: 13px; color: #5f5e5a; margin-top: 6px; }
+  .row { display: flex; gap: 8px; }
+  .row .btn { width: auto; flex: 1; }
+</style>
+</head>
+<body>
+<main>
+  <h1>ぼくの隊長</h1>
+  <p class="lead">紙にかいた隊長が、ゲームの中で軍を率いる。</p>
+
+  <section class="step">
+    <h2>1. 紙に、太いペンで隊長をかく</h2>
+    <p>白い紙に、黒か濃い色のペンで、枠いっぱいに大きくかいてね。</p>
+  </section>
+
+  <section class="step">
+    <h2>2. 写真にとる</h2>
+    <label class="btn" for="file">カメラでとる・写真をえらぶ</label>
+    <input id="file" type="file" accept="image/*" capture="environment">
+    <button class="btn sub" id="btnSample" type="button">サンプルの絵でためす</button>
+    <p class="note">紙が画面いっぱいに入るように、真上からとると、きれいに取り込めます。</p>
+  </section>
+
+  <section class="step">
+    <h2>3. できあがり</h2>
+    <div class="preview" id="preview"><div class="road"></div><div class="empty" id="empty">ここに隊長が出ます</div></div>
+    <p class="warn" id="warn"></p>
+    <div class="row">
+      <button class="btn" id="btnPlay" type="button" disabled>この隊長で出発</button>
+    </div>
+    <p class="note">写真はこの端末の中だけで使い、どこにも送りません。</p>
+  </section>
+</main>
+
+<script>
+(() => {
+  const KEY = "ev:hero";
+  const fileIn = document.getElementById("file");
+  const preview = document.getElementById("preview");
+  const empty = document.getElementById("empty");
+  const warn = document.getElementById("warn");
+  const btnPlay = document.getElementById("btnPlay");
+  const btnSample = document.getElementById("btnSample");
+  let heroUrl = "";
+
+  /* 新しい隊長を取り込んだら、前の子の続き・記録を消す（会場のタブレットで、前の子の軍が引き継がれないように） */
+  function clearEventSaves() {
+    try {
+      const ks = [];
+      for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.indexOf("ev:") === 0) ks.push(k); }
+      ks.forEach((k) => localStorage.removeItem(k));
+    } catch (e) {}
+  }
+
+  /* 写真 → 紙の白を透明にした PNG。
+     紙の白さは写真ごとに違う（影・照明）ので、明るい側の 92% 点を「紙の白」とみなし、そこから相対的に抜く */
+  function cutout(img) {
+    const MAX = 1024;
+    const k = Math.min(1, MAX / Math.max(img.naturalWidth, img.naturalHeight));
+    const w = Math.max(1, Math.round(img.naturalWidth * k)), h = Math.max(1, Math.round(img.naturalHeight * k));
+    const c = document.createElement("canvas"); c.width = w; c.height = h;
+    const g = c.getContext("2d", { willReadFrequently: true });
+    g.drawImage(img, 0, 0, w, h);
+    const d = g.getImageData(0, 0, w, h), p = d.data, n = w * h;
+    // 明るさのヒストグラム
+    const hist = new Uint32Array(256), lum = new Uint8ClampedArray(n);
+    for (let i = 0; i < n; i++) {
+      const r = p[i * 4], gg = p[i * 4 + 1], b = p[i * 4 + 2];
+      const l = Math.max(r, gg, b) * 0.5 + (r * 0.299 + gg * 0.587 + b * 0.114) * 0.5;
+      lum[i] = l; hist[l | 0]++;
+    }
+    let acc = 0, white = 255;
+    for (let v = 0; v < 256; v++) { acc += hist[v]; if (acc >= n * 0.92) { white = v; break; } }
+    white = Math.max(white, 120);
+    const hi = white - 18, lo = white - 70;                 // hi 以上は紙、lo 以下は線、その間はなだらかに
+    let minX = w, minY = h, maxX = -1, maxY = -1, cover = 0;
+    for (let i = 0; i < n; i++) {
+      const l = lum[i];
+      let a = l >= hi ? 0 : l <= lo ? 255 : Math.round(((hi - l) / (hi - lo)) * 255);
+      p[i * 4 + 3] = a;
+      if (a > 40) {
+        cover++;
+        const x = i % w, y = (i / w) | 0;
+        if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y;
+      }
+    }
+    if (maxX < 0) return null;
+    // 端の数ピクセルは紙の縁や影が残りやすいので、画面の縁に張りついた細い帯は無視する
+    g.putImageData(d, 0, 0);
+    const pad = Math.round(Math.max(maxX - minX, maxY - minY) * 0.06) + 2;
+    const sx = Math.max(0, minX - pad), sy = Math.max(0, minY - pad);
+    const sw = Math.min(w, maxX + pad) - sx, sh = Math.min(h, maxY + pad) - sy;
+    const OUT = 480, k2 = Math.min(1, OUT / Math.max(sw, sh));
+    const o = document.createElement("canvas"); o.width = Math.max(1, Math.round(sw * k2)); o.height = Math.max(1, Math.round(sh * k2));
+    o.getContext("2d").drawImage(c, sx, sy, sw, sh, 0, 0, o.width, o.height);
+    return { canvas: o, cover: cover / n, boxRatio: Math.max(sw, sh) / Math.max(w, h) };
+  }
+
+  function show(res) {
+    preview.querySelectorAll("canvas").forEach((e) => e.remove());
+    if (!res) {
+      empty.hidden = false; empty.textContent = "線が見つかりません。もっと濃く、大きくかいてね";
+      btnPlay.disabled = true; heroUrl = ""; return;
+    }
+    empty.hidden = true;
+    preview.appendChild(res.canvas);
+    warn.textContent = res.boxRatio < 0.3 ? "小さめです。枠いっぱいに、太いペンでかくと、ゲームでも見やすくなります" : "";
+    heroUrl = res.canvas.toDataURL("image/png");
+    btnPlay.disabled = false;
+  }
+
+  function fromImage(img) {
+    try { show(cutout(img)); } catch (e) { warn.textContent = "読み込めませんでした。もう一度とってみてね"; }
+  }
+
+  fileIn.addEventListener("change", () => {
+    const f = fileIn.files && fileIn.files[0];
+    if (!f) return;
+    const img = new Image();
+    img.onload = () => { fromImage(img); URL.revokeObjectURL(img.src); };
+    img.onerror = () => { warn.textContent = "この写真は読めませんでした"; };
+    img.src = URL.createObjectURL(f);
+  });
+
+  btnSample.addEventListener("click", () => {
+    const img = new Image();
+    img.onload = () => fromImage(img);
+    img.src = "sample_doodle.png?" + Date.now();
+  });
+
+  btnPlay.addEventListener("click", () => {
+    if (!heroUrl) return;
+    clearEventSaves();
+    try { localStorage.setItem(KEY, heroUrl); } catch (e) { warn.textContent = "この端末には保存できませんでした"; return; }
+    location.href = "million_march.html";
+  });
+})();
+</script>
+</body>
+</html>
