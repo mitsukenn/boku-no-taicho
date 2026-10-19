@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><meta name="theme-color" content="#241c18"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="ぼくの隊長"><link rel="apple-touch-icon" href="assets/icons/million-180.png"><link rel="icon" type="image/png" href="assets/icons/million-192.png"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found]){display:none!important}</style><style>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><meta name="theme-color" content="#241c18"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="長崎クエスト"><link rel="apple-touch-icon" href="assets/icons/million-180.png"><link rel="icon" type="image/png" href="assets/icons/million-192.png"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found]){display:none!important}</style><style>
 #app .bar-lab { display:table; padding:4px 7px; border-radius:3px; background:rgba(30,38,30,.72); color:#f1e5c6; }
 </style><script async src="https://www.googletagmanager.com/gtag/js?id=G-740PJ5K47G"></script>
 <script>
@@ -16,7 +16,7 @@ gtag('js', new Date());
 gtag('config', 'G-740PJ5K47G');
 </script>
 </head><body>
-<title>ぼくの隊長（試作）</title>
+<title>長崎クエスト</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chango&family=Barlow+Semi+Condensed:wght@400;500;600;700&display=swap">
@@ -123,6 +123,14 @@ gtag('config', 'G-740PJ5K47G');
   .btn-sound:focus-visible{outline:2px solid var(--gold); outline-offset:2px}
 
   /* ---------- Overlay panels ---------- */
+
+  .story{padding:0; background:#000}
+  .story-bg{position:absolute; inset:0; background:center/cover no-repeat; opacity:0; transition:opacity 1.2s ease}
+  .story-bg.on{opacity:1}
+  .story-text{position:absolute; left:0; right:0; bottom:22%; padding:0 24px; text-align:center; color:#fff; font-size:clamp(17px,2.6vw,24px); line-height:1.7; text-shadow:0 2px 10px rgba(0,0,0,.9),0 0 2px #000; opacity:0; transition:opacity .6s}
+  .story-text.on{opacity:1}
+  .story-ui{position:absolute; left:0; right:0; bottom:6%; display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap}
+  .story-ui .howto-link{color:rgba(255,255,255,.75)}
   .ov{
     position:absolute; inset:0;
     display:flex; flex-direction:column;
@@ -611,10 +619,21 @@ gtag('config', 'G-740PJ5K47G');
   <div class="banner" id="banner" hidden><div class="b1" id="bannerT1"></div><div class="b2" id="bannerT2"></div></div>
   <div class="warn" id="warn" hidden><i class="band top"></i><i class="band bot"></i><div class="wtxt">WARNING</div><div class="wsub"><span id="warnSub">巨人接近</span></div></div>
 
+
+  <div class="ov story" id="ovStory" hidden>
+    <div class="story-bg" id="storyBg"></div>
+    <div class="story-bg" id="storyBg2"></div>
+    <div class="story-text" id="storyText"></div>
+    <div class="story-ui">
+      <button class="btn" id="storyStart">▶ ものがたりをはじめる</button>
+      <button class="btn ghost" id="storyNext" hidden>つぎへ</button>
+      <button class="howto-link" id="storySkip">とばす</button>
+    </div>
+  </div>
   <div class="ov" id="ovTitle">
     <div class="tablet">
       <div class="eyebrow">数で巨人を倒せ</div>
-      <h1>ぼくの隊長</h1>
+      <h1>長崎クエスト</h1>
       <p class="tag-line">ゲートをくぐって、<br>軍勢を100万へ。</p>
       <div class="records" id="records" hidden></div>
       <div class="btn-row">
@@ -622,7 +641,7 @@ gtag('config', 'G-740PJ5K47G');
         <button class="btn ghost" id="btnContinue" hidden>続きから</button>
         <button class="btn ghost" id="btnRankTitle" hidden>🏆 ランキング</button>
       </div>
-      <div><button class="howto-link" id="btnHowto">遊び方</button><a class="howto-link" href="index.html">べつの隊長をかく</a></div>
+      <div><button class="howto-link" id="btnHowto">遊び方</button><button class="howto-link" id="btnStory">ものがたり</button><a class="howto-link" href="index.html">べつの隊長をかく</a></div>
     </div>
   </div>
 
@@ -1980,7 +1999,7 @@ const Hero = (() => {
         const sil = document.createElement("canvas"); sil.width = w; sil.height = h;
         const sg = sil.getContext("2d");
         sg.drawImage(img, 0, 0); sg.globalCompositeOperation = "source-in"; sg.fillStyle = "#fff"; sg.fillRect(0, 0, w, h);
-        const o = Math.max(2, Math.round(Math.max(w, h) * 0.018));
+        const o = Math.max(2, Math.round(Math.max(w, h) * 0.028));
         for (let a = 0; a < 8; a++) g.drawImage(sil, -w / 2 + Math.cos(a * Math.PI / 4) * o, -h + Math.sin(a * Math.PI / 4) * o, w, h);
         g.drawImage(img, -w / 2, -h, w, h);
         return c;
@@ -2214,6 +2233,7 @@ function buildStageOnce(st, str) {
     const qb = (q0.n * wpow(q0.w) >= q1.n * wpow(q1.w)) ? q0 : q1;
     bestE = qb.n; bestW = qb.w;
     z += rnd(gap, gap + 6);
+    if (i % 2 === 0) items.push({ type: "food", z: z - rnd(4, 7), x: Math.random() < 0.5 ? -1.6 : 1.6, food: FOODS[(st * 3 + i) % FOODS.length], got: 0 });
 
     // 道の途中に巨人。中盤で1体、ステージ6以降は終盤にもう1体
     const mid = Math.floor(gates / 2);
@@ -2689,6 +2709,10 @@ function update(dt) {
     } else if (it.type === "squad" && !it.dead) {
       updateSquadUnits(it, dt);
       if (crowd.z >= it.z - 2.1) { crowd.z = it.z - 2.1; startBattle(it); break; }
+    } else if (it.type === "food") {
+      if (!it.got && crowd.pz < it.z && crowd.z >= it.z) {
+        if (Math.abs(crowd.x - it.x) < 1.7) eatFood(it); else it.got = -1;   // 取り逃し
+      }
     } else if (it.type === "chest") {
       if (!it.open && crowd.pz < it.z && crowd.z >= it.z) {
         if (Math.abs(crowd.x - it.x) < 1.55) openChest(it); else it.open = -1;   // 取り逃し
@@ -2989,7 +3013,12 @@ function drawUnit(u, body, bodyD, skin, t, wt) {
        : [ALLY_RANK_SPRITE[Math.min(r, ALLY_RANK_SPRITE.length - 1)] + frame, "ally_titan_" + frame, "ally_run_" + frame])
     : (r === 0 ? ["enemy_" + ti + "_" + frame, "enemy_stand_" + frame] : ["enemy_captain_" + frame, "enemy_stand_" + frame]);
   if (ally && (u.lead || r === 1) && Hero.ok()) {
-    Hero.foot(ctx, p.x, feet, h * 1.08 * (u.lead ? 2.4 : 1.25), frame);
+    if (u.lead) {   // 先頭の隊長は足元に金色の光の輪を出して目立たせる
+      ctx.strokeStyle = 'rgba(255,214,120,.9)'; ctx.lineWidth = Math.max(1.5, p.s * 0.09);
+      ctx.beginPath(); ctx.ellipse(p.x, p.y, p.s * 0.9, p.s * 0.28, 0, 0, Math.PI * 2); ctx.stroke();
+      ctx.fillStyle = 'rgba(255,214,120,.18)'; ctx.fill();
+    }
+    Hero.foot(ctx, p.x, feet, h * 1.08 * (u.lead ? 3.2 : 1.3), frame);
     return;
   }
   const sid = SP.first(ids);
@@ -3161,6 +3190,57 @@ function drawGate(g) {
   for(let j=1;j<10;j++){const xx=xs[0]+(xs[2]-xs[0])*j/10;ctx.beginPath();ctx.moveTo(xx,y0-pw*1.1);ctx.lineTo(xx+pw*.4,y0-pw*.5);ctx.lineTo(xx+pw*.1,y0);ctx.stroke();}
   ctx.fillStyle='#665d47';ctx.beginPath();ctx.moveTo(xs[0]+s*.5,y0-pw*1.6);ctx.lineTo(xs[0]+s*.7,y0-pw*.7);ctx.lineTo(xs[0]+s*.9,y0-pw*1.6);ctx.fill();
   ctx.globalAlpha = 1;
+}
+
+
+/* ===== 長崎のアイテム（イベント用）=====
+   道の端に落ちている。通ると拾えて兵力が少し増え、クリア画面の図鑑にたまる。絵は event/assets/items/（ChatGPT で制作・白抜き） */
+const FOODS = [
+  { id: "castella", name: "カステラ" },
+  { id: "champon", name: "ちゃんぽん" },
+  { id: "saraudon", name: "皿うどん" },
+  { id: "kakuni", name: "角煮まんじゅう" },
+  { id: "turkish", name: "トルコライス" },
+  { id: "milkseki", name: "ミルクセーキ" },
+];
+const FOOD_BONUS = 0.08;     // 拾ったときの兵力の伸び（8%・最低+3）
+const foodImgs = {};
+for (const f of FOODS) { const im = new Image(); im.src = "assets/items/" + f.id + ".webp"; foodImgs[f.id] = im; }
+const foodsGot = () => store.get("mm.foods", {}) || {};
+function eatFood(it) {
+  it.got = 1;
+  const before = crowd.count;
+  setCount(Math.max(before + 3, Math.round(before * (1 + FOOD_BONUS))));
+  popText(it.food.name + "！ +" + fmt(crowd.count - before), C.gold, it.z, true);
+  const got = foodsGot(); got[it.food.id] = (got[it.food.id] || 0) + 1; store.set("mm.foods", got);
+  for (let i = 0; i < 16; i++) puff(it.x + rnd(-.5, .5), rnd(.6, 1.6), it.z, C.gold, 1);
+  addFx("fx_spark", it.x, 1.4, it.z, 1.6, 0.5, 1.2);
+  Snd.great(); vib(20); bumpArmy();
+}
+function drawFood(it) {
+  if (it.got > 0) return;
+  const bob = Math.sin(time * 3 + it.z) * 0.12;
+  const b = proj(it.x, 0.55 + bob, it.z), g = proj(it.x, 0, it.z);
+  if (!b || !g) return;
+  const s = g.s;
+  const alpha = Math.max(0, Math.min(1, (DRAW_Z - (it.z - cam.z)) / 34));
+  if (alpha <= 0 || s < 2) return;
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = "rgba(0,0,0,.22)";
+  ctx.beginPath(); ctx.ellipse(g.x, g.y, s * 0.55, s * 0.16, 0, 0, 6.2832); ctx.fill();
+  const im = foodImgs[it.food.id], h = 1.5 * s;
+  if (im && im.complete && im.naturalWidth) {
+    const w = h * im.naturalWidth / im.naturalHeight;
+    ctx.drawImage(im, b.x - w / 2, b.y - h / 2, w, h);
+  } else {
+    ctx.fillStyle = C.gold; ctx.beginPath(); ctx.arc(b.x, b.y, s * 0.5, 0, 6.2832); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+/** クリア画面に出す「集めた長崎のもの」 */
+function foodsSummary() {
+  const got = foodsGot(), names = FOODS.filter((f) => got[f.id]).map((f) => f.name);
+  return names.length ? "集めた長崎のもの（" + names.length + "/" + FOODS.length + "）：" + names.join("・") : "道に落ちている長崎のものを拾うと、兵力が増えて図鑑にたまる。";
 }
 
 /* --- 宝箱 -------------------------------------------------- */
@@ -3677,6 +3757,7 @@ function render() {
 
   for (const it of far) {
     if (it.type === "chest") drawChest(it);
+    else if (it.type === "food") drawFood(it);
     else if (it.type === "gate") drawGate(it);
     else if (it.type === "blade") drawBlade(it);
     else if (it.type === "squad") { drawHost(it, false, time); drawSquadBanner(it); }
@@ -3687,6 +3768,7 @@ function render() {
 
   for (const it of near) {
     if (it.type === "chest") drawChest(it);
+    else if (it.type === "food") drawFood(it);
     else if (it.type === "gate") drawGate(it);
     else if (it.type === "blade") drawBlade(it);
     else if (it.type === "squad") { drawHost(it, false, time); drawSquadBanner(it); }
@@ -3887,6 +3969,7 @@ function stageClear() {
   }
   document.getElementById("clearTitle").textContent = "神殿を制圧した";
   document.getElementById("btnNext").textContent = "次のステージへ";
+  document.getElementById("clearLede").textContent = foodsSummary();
 
   if (stage >= FINAL_STAGE && !endless) {          // 完全制覇
     recordClear(rankNow());
@@ -4769,6 +4852,57 @@ if (document.fonts && document.fonts.load) {
 } else {
   boot();
 }
+})();
+</script>
+
+<script>
+/* オープニング：背景を切り替えながらナレーションを流す。index.html で新しい隊長を取り込むたびに ev: が消えるので、子ども1人につき1回見る */
+(() => {
+  const SCENES = [
+    ["nagasaki_01_meganebashi", "いまから450年前。長崎は、海と山にはさまれた、小さな村でした。"],
+    ["nagasaki_02_dejima", "船に乗って、遠い国からたくさんの人がやってきました。日本で外国とつながる港は、長崎だけ。カステラも、ちゃんぽんも、ガラスも、ここから日本中に広まったのです。"],
+    ["nagasaki_07_kunchi", "長崎の人たちは、よその国の文化をこわがらず、自分たちの祭りや食べものに混ぜて、新しいものを作ってきました。"],
+    ["nagasaki_04_gunkanjima", "船を作る技、海の底から石炭をほる技。長崎の人の手が、日本を動かしてきました。"],
+    ["nagasaki_03_inasayama", "そしていま。この光のひとつひとつが、長崎で働く人たち、長崎で暮らす家族です。"],
+    ["nagasaki_08_tram", "でも、長崎の人は、少しずつ減っています。このまちの次の450年は、だれが作るのでしょう。"],
+    ["nagasaki_05_glover", "きみが描いた隊長といっしょに、長崎のまちを進みましょう。カステラを拾い、仲間を集め、まだ見たことのない長崎へ。未来の長崎を作るのは、きみです。"],
+  ];
+  const ov = document.getElementById("ovStory"), bgs = [document.getElementById("storyBg"), document.getElementById("storyBg2")];
+  const txt = document.getElementById("storyText"), bStart = document.getElementById("storyStart"), bNext = document.getElementById("storyNext"), bSkip = document.getElementById("storySkip");
+  const K = "ev:story.seen";
+  let i = -1, audio = null, timer = 0, cur = 0;
+  function seen() { try { return localStorage.getItem(K) === "1"; } catch (e) { return false; } }
+  function markSeen() { try { localStorage.setItem(K, "1"); } catch (e) {} }
+  function show(n) {
+    i = n;
+    const [bg, t] = SCENES[n];
+    cur ^= 1;
+    bgs[cur].style.backgroundImage = "url(assets/backgrounds/" + bg + ".webp)";
+    bgs[cur].classList.add("on"); bgs[cur ^ 1].classList.remove("on");
+    txt.classList.remove("on"); setTimeout(() => { txt.textContent = t; txt.classList.add("on"); }, 300);
+    if (audio) { audio.pause(); audio = null; }
+    clearTimeout(timer);
+    audio = new Audio("assets/story/" + String(n + 1).padStart(2, "0") + ".mp3");
+    audio.onended = () => { timer = setTimeout(next, 900); };
+    audio.onerror = () => { timer = setTimeout(next, 5500); };
+    audio.play().catch(() => { timer = setTimeout(next, 5500); });
+  }
+  function next() { if (i + 1 < SCENES.length) show(i + 1); else end(); }
+  function end() {
+    clearTimeout(timer); if (audio) { audio.pause(); audio = null; }
+    markSeen(); ov.hidden = true;
+    const title = document.getElementById("ovTitle"); if (title) title.hidden = false;
+  }
+  function open() {
+    i = -1; ov.hidden = false; bStart.hidden = false; bNext.hidden = true; txt.textContent = ""; txt.classList.remove("on");
+    bgs[0].style.backgroundImage = "url(assets/backgrounds/" + SCENES[0][0] + ".webp)"; bgs[0].classList.add("on"); bgs[1].classList.remove("on");
+    const title = document.getElementById("ovTitle"); if (title) title.hidden = true;
+  }
+  bStart.addEventListener("click", () => { bStart.hidden = true; bNext.hidden = false; show(0); });
+  bNext.addEventListener("click", next);
+  bSkip.addEventListener("click", end);
+  const again = document.getElementById("btnStory"); if (again) again.addEventListener("click", open);
+  if (!seen() && !location.search.includes("nostory")) open();
 })();
 </script>
 
