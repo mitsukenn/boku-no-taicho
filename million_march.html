@@ -127,7 +127,7 @@ gtag('config', 'G-740PJ5K47G');
   .ov.story{padding:0; background:#000; overflow:hidden; z-index:5}   /* .ov の半透明の背景を上書きして、下のゲーム画面を見せない */
   .story-bg{position:absolute; inset:0; background:#000 center/cover no-repeat; opacity:0; transition:opacity 1.2s ease}
   .story-bg.on{opacity:1}
-  .story-text{position:absolute; left:0; right:0; bottom:20%; padding:0 24px; text-align:center; color:#fff; font-size:clamp(24px,4vw,40px); font-weight:700; line-height:1.7; text-shadow:0 2px 14px rgba(0,0,0,.95),0 0 3px #000; opacity:0; transition:opacity .6s}
+  .story-text{position:absolute; left:0; right:0; bottom:18%; padding:0 16px; text-align:center; color:#fff; font-size:clamp(19px,5vw,36px); font-weight:700; line-height:1.75; word-break:keep-all; overflow-wrap:anywhere; text-shadow:0 2px 14px rgba(0,0,0,.95),0 0 3px #000; opacity:0; transition:opacity .6s}
   .story-text.on{opacity:1}
   .story-ui{position:absolute; left:0; right:0; bottom:6%; display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap}
   .story-ui .howto-link{color:rgba(255,255,255,.75)}
@@ -4922,13 +4922,13 @@ if (document.fonts && document.fonts.load) {
 (() => {
   const HERO_NAME = (() => { try { return (localStorage.getItem("ev:hero.name") || "").trim().slice(0, 8); } catch (e) { return ""; } })();   // 本体の HERO_NAME は別スクリプトの中なので、ここでも読む
   const SCENES = [
-    ["nagasaki_01_meganebashi", "いまから450年前。長崎は、海と山にはさまれた、小さな村でした。"],
-    ["nagasaki_02_dejima", "船に乗って、遠い国からたくさんの人がやってきました。日本で外国とつながる港は、長崎だけ。カステラも、ちゃんぽんも、ガラスも、ここから日本中に広まったのです。"],
-    ["nagasaki_07_kunchi", "長崎の人たちは、よその国の文化をこわがらず、自分たちの祭りや食べものに混ぜて、新しいものを作ってきました。"],
-    ["nagasaki_04_gunkanjima", "船を作る技、海の底から石炭をほる技。長崎の人の手が、日本を動かしてきました。"],
-    ["nagasaki_03_inasayama", "そしていま。この光のひとつひとつが、長崎で働く人たち、長崎で暮らす家族です。"],
-    ["nagasaki_08_tram", "でも、長崎の人は、少しずつ減っています。このまちの次の450年は、だれが作るのでしょう。"],
-    ["nagasaki_05_glover", (HERO_NAME ? HERO_NAME + "隊長" : "きみが描いた隊長") + "といっしょに、長崎のまちを進みましょう。カステラを拾い、仲間を集め、まだ見たことのない長崎へ。未来の長崎を作るのは、きみです。"],
+    ["nagasaki_01_meganebashi", "いまから450年前。\n長崎は、海と山にはさまれた、\n小さな村でした。"],
+    ["nagasaki_02_dejima", "船に乗って、遠い国から\nたくさんの人がやってきました。\n日本で外国とつながる港は、\n長崎だけ。\nカステラも、ちゃんぽんも、ガラスも、\nここから日本中に広まったのです。"],
+    ["nagasaki_07_kunchi", "長崎の人たちは、\nよその国の文化をこわがらず、\n自分たちの祭りや食べものに混ぜて、\n新しいものを作ってきました。"],
+    ["nagasaki_04_gunkanjima", "船を作る技、\n海の底から石炭をほる技。\n長崎の人の手が、\n日本を動かしてきました。"],
+    ["nagasaki_03_inasayama", "そしていま。\nこの光のひとつひとつが、\n長崎で働く人たち、\n長崎で暮らす家族です。"],
+    ["nagasaki_08_tram", "でも、長崎の人は、\n少しずつ減っています。\nこのまちの次の450年は、\nだれが作るのでしょう。"],
+    ["nagasaki_05_glover", (HERO_NAME ? HERO_NAME + "隊長" : "きみが描いた隊長") + "といっしょに、\n長崎のまちを進みましょう。\nカステラを拾い、仲間を集め、\nまだ見たことのない長崎へ。\n未来の長崎を作るのは、きみです。"],
   ];
   const ov = document.getElementById("ovStory"), bgs = [document.getElementById("storyBg"), document.getElementById("storyBg2")];
   const txt = document.getElementById("storyText"), bStart = document.getElementById("storyStart"), bNext = document.getElementById("storyNext"), bSkip = document.getElementById("storySkip");
@@ -4942,7 +4942,7 @@ if (document.fonts && document.fonts.load) {
     cur ^= 1;
     bgs[cur].style.backgroundImage = "url(assets/backgrounds/" + bg + ".webp)";
     bgs[cur].classList.add("on"); bgs[cur ^ 1].classList.remove("on");
-    txt.classList.remove("on"); setTimeout(() => { txt.textContent = t; txt.classList.add("on"); }, 300);
+    txt.classList.remove("on"); setTimeout(() => { txt.innerHTML = t.split("\n").map((l) => "<span>" + l + "</span>").join("<br>"); txt.classList.add("on"); }, 300);
     if (audio) { audio.pause(); audio = null; }
     clearTimeout(timer);
     audio = new Audio("assets/story/" + String(n + 1).padStart(2, "0") + ".mp3");
