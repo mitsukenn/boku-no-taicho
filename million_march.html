@@ -131,6 +131,11 @@ gtag('config', 'G-740PJ5K47G');
   .story-text.on{opacity:1}
   .story-ui{position:absolute; left:0; right:0; bottom:6%; display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap}
   .story-ui .howto-link{color:rgba(255,255,255,.75)}
+  .story-snd{position:absolute; top:14px; right:14px; width:48px; height:48px; border-radius:50%; border:1.5px solid rgba(255,255,255,.7); background:rgba(0,0,0,.45); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0}
+  .story-snd .x{display:none}
+  .story-snd.off .w1, .story-snd.off .w2{display:none}
+  .story-snd.off .x{display:block}
+  .story-snd.off{color:rgba(255,255,255,.6)}
 
   .talk-theme{font-size:clamp(20px,3.4vw,30px); font-weight:700; line-height:1.5; margin:8px 0 10px; color:#ffe9b8}
   .talk-timer{display:flex; align-items:center; justify-content:center; gap:14px; margin:6px 0 10px}
@@ -628,6 +633,9 @@ gtag('config', 'G-740PJ5K47G');
     <div class="story-bg" id="storyBg"></div>
     <div class="story-bg" id="storyBg2"></div>
     <div class="story-text" id="storyText"></div>
+    <button class="story-snd" id="storySnd" type="button" aria-label="ナレーションのオン・オフ">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="w1" d="M16 9a4 4 0 0 1 0 6"/><path class="w2" d="M19 6a8 8 0 0 1 0 12"/><path class="x" d="M17 9l5 6M22 9l-5 6"/></svg>
+    </button>
     <div class="story-ui">
       <button class="btn" id="storyStart">▶ ものがたりをはじめる</button>
       <button class="btn ghost" id="storyNext" hidden>つぎへ</button>
@@ -4932,8 +4940,13 @@ if (document.fonts && document.fonts.load) {
   ];
   const ov = document.getElementById("ovStory"), bgs = [document.getElementById("storyBg"), document.getElementById("storyBg2")];
   const txt = document.getElementById("storyText"), bStart = document.getElementById("storyStart"), bNext = document.getElementById("storyNext"), bSkip = document.getElementById("storySkip");
-  const K = "ev:story.seen";
+  const K = "ev:story.seen", KM = "ev:story.mute";
   let i = -1, audio = null, timer = 0, cur = 0;
+  const bSnd = document.getElementById("storySnd");
+  let muted = (() => { try { return localStorage.getItem(KM) === "1"; } catch (e) { return false; } })();
+  function paintSnd() { bSnd.classList.toggle("off", muted); }
+  bSnd.addEventListener("click", () => { muted = !muted; try { localStorage.setItem(KM, muted ? "1" : "0"); } catch (e) {} paintSnd(); if (audio) audio.muted = muted; });
+  paintSnd();
   function seen() { try { return localStorage.getItem(K) === "1"; } catch (e) { return false; } }
   function markSeen() { try { localStorage.setItem(K, "1"); } catch (e) {} }
   function show(n) {
@@ -4946,6 +4959,7 @@ if (document.fonts && document.fonts.load) {
     if (audio) { audio.pause(); audio = null; }
     clearTimeout(timer);
     audio = new Audio("assets/story/" + String(n + 1).padStart(2, "0") + ".mp3");
+    audio.muted = muted;   // 切っていても再生はして、ナレーションの長さで次へ進む
     audio.onended = () => { timer = setTimeout(next, 900); };
     audio.onerror = () => { timer = setTimeout(next, 5500); };
     audio.play().catch(() => { timer = setTimeout(next, 5500); });
