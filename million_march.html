@@ -140,6 +140,25 @@ gtag('config', 'G-740PJ5K47G');
   .talk-theme{font-size:clamp(20px,3.4vw,30px); font-weight:700; line-height:1.5; margin:8px 0 10px; color:#ffe9b8}
   .talk-timer{display:flex; align-items:center; justify-content:center; gap:14px; margin:6px 0 10px}
   .talk-timer span{font:700 34px/1 "Barlow Semi Condensed", sans-serif; letter-spacing:.04em; min-width:4ch; text-align:center}
+
+  .turn-pic{height:150px; display:flex; align-items:flex-end; justify-content:center; margin:6px 0 4px}
+  .turn-pic img{max-height:150px; max-width:70%; box-sizing:border-box; padding:8px; border-radius:12px; background:#f6f1e6}   /* 黒い線の落書きが暗い板に沈まないように */
+  .tablet.order{width:min(560px, 100%)}
+  .ord-row{display:flex; gap:8px; margin:8px 0}
+  .ord-row input{flex:1; min-width:0; font-size:18px; padding:10px 12px; border-radius:10px; border:1px solid rgba(224,168,60,.55); background:#1a1411; color:#fff}
+  .ord-row .btn{flex:0 0 auto; padding-left:16px; padding-right:16px}
+  .ord-chips{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin:4px 0 10px}
+  .ord-chips button{font:inherit; font-size:14px; padding:6px 10px; border-radius:999px; border:1px solid rgba(255,233,184,.35); background:rgba(255,255,255,.06); color:#ffe9b8; cursor:pointer}
+  .ord-mic-on{background:#c0392b !important; color:#fff !important}
+  .ord-result{margin:10px 0 6px; text-align:left}
+  .ord-say{font-size:18px; font-weight:700; color:#ffe9b8; margin:0 0 8px; text-align:center}
+  .ord-cap{font-size:12px; color:rgba(255,255,255,.6); margin:0 0 4px}
+  .ord-code{margin:0; padding:10px 12px; border-radius:8px; background:#0e1512; color:#9fe0b0; font:14px/1.6 ui-monospace, Consolas, monospace; white-space:pre-wrap; word-break:break-all}
+  .ord-mode{font-size:12px; color:rgba(255,255,255,.55); margin:8px 0 0}
+  .ord-staff{font-size:13px; color:rgba(255,255,255,.7); text-align:left; margin-top:6px}
+  .ord-staff summary{cursor:pointer}
+  .done-list{text-align:left; margin:6px 0 12px; padding-left:1.2em; line-height:1.7}
+  .done-list small{color:rgba(255,255,255,.6)}
   .ov{
     position:absolute; inset:0;
     display:flex; flex-direction:column;
@@ -656,6 +675,55 @@ gtag('config', 'G-740PJ5K47G');
       </div>
     </div>
   </div>
+
+  <div class="ov" id="ovTurn" hidden>
+    <div class="tablet">
+      <div class="eyebrow" id="turnEyebrow">つぎの番</div>
+      <div class="turn-pic"><img id="turnPic" alt=""></div>
+      <h2 id="turnName">隊長の番！</h2>
+      <p class="lede" id="turnLede">ゲートをえらんで、仲間をふやそう。</p>
+      <div class="btn-row"><button class="btn" id="turnGo">▶ 出撃</button></div>
+    </div>
+  </div>
+
+  <div class="ov" id="ovOrder" hidden>
+    <div class="tablet order">
+      <div class="eyebrow" id="ordWho">AIに注文</div>
+      <h2>ゲームを、どう変えたい？</h2>
+      <p class="lede">話すか、書くか、下からえらんでね。</p>
+      <div class="ord-row">
+        <input id="ordText" type="text" maxlength="60" placeholder="たとえば：敵を3倍にして" autocomplete="off">
+        <button class="btn ghost" id="ordMic" type="button">話す</button>
+      </div>
+      <div class="ord-chips" id="ordChips"></div>
+      <div class="btn-row"><button class="btn" id="ordSend" type="button">AIにたのむ</button></div>
+      <div class="ord-result" id="ordResult" hidden>
+        <p class="ord-say" id="ordSay"></p>
+        <div class="ord-cap">AIが書きかえた、ゲームの設定</div>
+        <pre class="ord-code" id="ordCode"></pre>
+      </div>
+      <div class="btn-row"><button class="btn" id="ordGo" type="button">この注文で出撃</button></div>
+      <p class="ord-mode" id="ordMode"></p>
+      <details class="ord-staff"><summary>係の人の設定</summary>
+        <p>AIにつなぐときは、Claude の APIキーをこの端末にだけ保存します（空にすると、おてほんモード）。</p>
+        <div class="ord-row"><input id="ordKey" type="password" placeholder="sk-ant-..." autocomplete="off"><button class="btn ghost" id="ordKeySave" type="button">保存</button></div>
+        <button class="howto-link" id="ordReset" type="button">注文をぜんぶ元にもどす</button>
+      </details>
+    </div>
+  </div>
+
+  <div class="ov" id="ovDone" hidden>
+    <div class="tablet">
+      <div class="eyebrow">ゲームづくり</div>
+      <h2 class="win" id="doneTitle">みんなでつくったゲーム、完成！</h2>
+      <p class="lede">プログラムを1行も書かずに、<br>ことばだけでゲームが変わったね。<br>これが、AIを使ったゲームづくり。</p>
+      <ul class="done-list" id="doneList"></ul>
+      <div class="btn-row">
+        <button class="btn" id="doneNext">つぎのチームへ</button>
+        <button class="btn ghost" id="doneMore">このまま遊ぶ</button>
+      </div>
+    </div>
+  </div>
   <div class="ov" id="ovTitle">
     <div class="tablet">
       <div class="eyebrow">数で巨人を倒せ</div>
@@ -668,7 +736,7 @@ gtag('config', 'G-740PJ5K47G');
         <button class="btn ghost" id="btnContinue" hidden>続きから</button>
         <button class="btn ghost" id="btnRankTitle" hidden>🏆 ランキング</button>
       </div>
-      <div><button class="howto-link" id="btnHowto">遊び方</button><button class="howto-link" id="btnStory">ものがたり</button><a class="howto-link" href="index.html">べつの隊長をかく</a></div>
+      <div><button class="howto-link" id="btnHowto">遊び方</button><button class="howto-link" id="btnStory">ものがたり</button><button class="howto-link" id="btnOrder">AIに注文</button><a class="howto-link" href="index.html">べつの隊長をかく</a></div>
     </div>
   </div>
 
@@ -702,6 +770,7 @@ gtag('config', 'G-740PJ5K47G');
       <div class="btn-row">
         <button class="btn" id="btnNext">次のステージへ</button>
         <button class="btn ghost" id="btnMapClear">マップへ</button>
+        <button class="btn ghost" id="btnOrderClear">AIに注文</button>
         <button class="btn share" id="btnShareClear">📷 シェア</button>
       </div>
     </div>
@@ -2010,15 +2079,17 @@ function setCount(n) {
 const HERO_NAME = (() => { try { return (localStorage.getItem("ev:hero.name") || "").trim().slice(0, 8); } catch (e) { return ""; } })();
 const heroCall = () => (HERO_NAME ? HERO_NAME + "隊長" : "隊長");
 const Hero = (() => {
-  let frames = null, aspect = 1;
   const url = (() => { try { return localStorage.getItem("ev:hero") || ""; } catch (e) { return ""; } })();
-  if (url) {
+  /* チーム（3人組）の落書き。先頭は今の番の子、「隊長」の段の兵には仲間の落書きも混ぜる */
+  const teamUrls = (() => { try { return (JSON.parse(localStorage.getItem("ev:team") || "[]") || []).map((m) => m && m.url).filter(Boolean); } catch (e) { return []; } })();
+  const sets = [];       // [frames]（読み込めたものから入る）
+  let frames = null;     // 今の番の子
+  function load(src, mine) {
     const img = new Image();
     img.onload = () => {
       const w = img.naturalWidth, h = img.naturalHeight;
       if (!w || !h) return;
-      aspect = w / h;
-      frames = [1, 2].map((f) => {
+      const fr = [1, 2].map((f) => {
         const c = document.createElement("canvas");
         c.width = Math.round(w * 1.2); c.height = Math.round(h * 1.1);
         const g = c.getContext("2d");
@@ -2033,18 +2104,46 @@ const Hero = (() => {
         g.drawImage(img, -w / 2, -h, w, h);
         return c;
       });
+      if (mine) frames = fr;
+      sets.push(fr);
     };
-    img.src = url;
+    img.src = src;
   }
+  if (url) load(url, true);
+  teamUrls.filter((u) => u !== url).forEach((u) => load(u, false));
   const ok = () => !!frames;
-  /** 足元合わせ：下端中央を (x, y) に置き、高さ h で描く */
-  function foot(ctx, x, y, h, frame) {
-    if (!frames) return false;
-    const c = frames[frame === 2 ? 1 : 0], w = (h * c.width) / c.height;
+  /** 足元合わせ：下端中央を (x, y) に置き、高さ h で描く。pick があれば仲間の落書きから選ぶ（兵ごとに決まった子） */
+  function foot(ctx, x, y, h, frame, pick) {
+    const fr = pick != null && sets.length > 1 ? sets[Math.floor(pick * 997) % sets.length] : frames;
+    if (!fr) return false;
+    const c = fr[frame === 2 ? 1 : 0], w = (h * c.width) / c.height;
     ctx.drawImage(c, x - w / 2, y - h, w, h);
     return true;
   }
   return { ok, foot, has: !!url };
+})();
+
+/* ===== AIに注文（イベント用）=====
+   子どもの注文（声・文字）を、AI が「設定」に書き換える。設定はゲームの数か所（敵の数・速さ・景色・曲・隊長の大きさ・
+   最初の仲間の数・長崎のアイテムの量・巨人）だけに効く。コードそのものは書き換えないので、何を言っても壊れない。
+   設定は ev:order に残り、3人の注文が積み重なっていく（新しいチームを取り込むと消える） */
+const ORDER_DEFAULT = { enemy: 1, speed: 1, army: 0, theme: "", bgm: "", hero: 1, food: 1, giant: true };
+const Order = (() => {
+  let o = Object.assign({}, ORDER_DEFAULT);
+  try { Object.assign(o, JSON.parse(localStorage.getItem("ev:order") || "{}") || {}); } catch (e) {}
+  const api = {
+    get enemy() { return o.enemy; }, get speed() { return o.speed; }, get army() { return o.army; },
+    get theme() { return o.theme; }, get bgm() { return o.bgm; }, get hero() { return o.hero; },
+    get food() { return o.food; }, get giant() { return o.giant; },
+    all: () => Object.assign({}, o),
+    set(n) { o = Object.assign({}, n); try { localStorage.setItem("ev:order", JSON.stringify(o)); } catch (e) {} },
+    /** 景色の差し替え。theme は背景の絵のファイル名の一部（"inasayama" など） */
+    themeObj() {
+      if (!o.theme) return null;
+      return STAGE_THEMES.concat(EXTRA_THEMES).find((t) => t.file.indexOf(o.theme) >= 0) || null;
+    },
+  };
+  return api;
 })();
 
 /** 追加素材（XSprites）→ 既存素材（SpriteKit）の順で描く */
@@ -2189,7 +2288,7 @@ function makeSquad(z, st, expect, ew, boss) {
   // 二乗則的に勝てない構成になる。取りこぼしを吸収する余白を必ず残す。
   const grow = Math.min(st, 10) * 0.012;
   const base = par * (boss ? rnd(0.58, 0.70 + grow * 0.5) : rnd(0.36, 0.50 + grow));
-  const n = Math.max(5, Math.round(base * ease(st)));
+  const n = Math.max(5, Math.round(base * ease(st) * Order.enemy));
   const sq = { type: "squad", z, count: n, max: n, weapon: sw, boss: !!boss, units: [], x: 0, expect, ew };
   syncUnits(sq, C.foe);
   return sq;
@@ -2262,11 +2361,15 @@ function buildStageOnce(st, str) {
     const qb = (q0.n * wpow(q0.w) >= q1.n * wpow(q1.w)) ? q0 : q1;
     bestE = qb.n; bestW = qb.w;
     z += rnd(gap, gap + 6);
-    if (i % 2 === 0) items.push({ type: "food", z: z - rnd(4, 7), x: Math.random() < 0.5 ? -1.6 : 1.6, food: FOODS[(st * 3 + i) % FOODS.length], got: 0 });
+    if (Order.food > 0 && i % (Order.food >= 2 ? 1 : 2) === 0) {   // 注文で量が変わる（0=なし・1=2ゲートに1つ・2=毎ゲート・3=左右両方）
+      const fx = Math.random() < 0.5 ? -1.6 : 1.6;
+      items.push({ type: "food", z: z - rnd(4, 7), x: fx, food: FOODS[(st * 3 + i) % FOODS.length], got: 0 });
+      if (Order.food >= 3) items.push({ type: "food", z: z - rnd(8, 10), x: -fx, food: FOODS[(st * 3 + i + 1) % FOODS.length], got: 0 });
+    }
 
     // 道の途中に巨人。中盤で1体、ステージ6以降は終盤にもう1体
     const mid = Math.floor(gates / 2);
-    if (i === mid || (st >= 6 && i === gates - 2)) {
+    if (Order.giant && (i === mid || (st >= 6 && i === gates - 2))) {
       z += 6;
       const gi = makeGiant(z, st, expect, ew, false);
       items.push(gi);
@@ -2791,7 +2894,7 @@ const EXTRA_THEMES = [
   { name: "坂の街と路面電車", file: "nagasaki_08_tram.webp", mist: [120, 140, 150], sky: ["#5fa8e0", "#e8f0f8", "#2a5080"] },
 ];
 const themeIndex = (st) => Math.floor((((Math.max(1, st | 0) - 1) % 10)) / 2);
-const themeFor = (st) => (st > 10 ? EXTRA_THEMES[(st - 11) % EXTRA_THEMES.length] : STAGE_THEMES[themeIndex(st)]);
+const themeFor = (st) => Order.themeObj() || (st > 10 ? EXTRA_THEMES[(st - 11) % EXTRA_THEMES.length] : STAGE_THEMES[themeIndex(st)]);
 const bgImages = new Map();
 function bgImage(theme) {
   if (!bgImages.has(theme.file)) {
@@ -3047,7 +3150,7 @@ function drawUnit(u, body, bodyD, skin, t, wt) {
       ctx.beginPath(); ctx.ellipse(p.x, p.y, p.s * 0.9, p.s * 0.28, 0, 0, Math.PI * 2); ctx.stroke();
       ctx.fillStyle = 'rgba(255,214,120,.18)'; ctx.fill();
     }
-    Hero.foot(ctx, p.x, feet, h * 1.08 * (u.lead ? 3.2 : 1.3), frame);
+    Hero.foot(ctx, p.x, feet, h * 1.08 * (u.lead ? 3.2 * Order.hero : 1.3), frame, u.lead ? null : u.ph);
     return;
   }
   const sid = SP.first(ids);
@@ -3934,12 +4037,13 @@ function beginStage(st, army, weapon) {
   store.set("mm.save", { st, army, weapon, kills, endless, rb: runBest });
   if (st > store.get("mm.bestStage", 0)) store.set("mm.bestStage", st);
   crowd.speed = 8 + Math.min(st - 1, 9) * 0.6;     // 8 → 13.4（旧版の約2/3）
+  crowd.speed *= Order.speed;
   resetCrowd(army, weapon);
   buildStage(st);
   parts.length = 0; pops.length = 0;
   battle = null;
   state = "run";
-  Snd.song(themeIndex(st), st % 2 === 0); Snd.intense(false); Snd.music(true);   // 偶数面は同じ景色の2曲目
+  if (Order.bgm) Snd.song(Order.bgm); else Snd.song(themeIndex(st), st % 2 === 0); Snd.intense(false); Snd.music(true);   // 偶数面は同じ景色の2曲目
   hStage.textContent = endless && st > FINAL_STAGE ? String(st) : st + "/" + FINAL_STAGE;
   hBar.style.width = "0%";
   ovTitle.hidden = ovClear.hidden = ovOver.hidden = ovWin.hidden = ovPause.hidden = ovSettings.hidden = true;
@@ -4024,6 +4128,7 @@ function stageClear() {
   document.getElementById("btnMapClear").hidden = false;
   ovClear.hidden = false;
   Result.prepareClear();
+  Team.decorate("clear");
 }
 
 function gameOver() {
@@ -4045,6 +4150,7 @@ function gameOver() {
   document.getElementById("oBest").textContent = fmt(best);
   ovOver.hidden = false;
   Result.show(ovOver, { stage });
+  Team.decorate("over");
 }
 
 /* --- タイトル画面用のデモ隊列 ------------------------------ */
@@ -4162,6 +4268,7 @@ const Talk = (() => {
 })();
 
 document.getElementById("btnNext").addEventListener("click", () => {
+  if (Team.take()) return;   // 3人組：つぎの子の番・注文へ
   if (Talk.due(stage)) { const st = stage; ovClear.hidden = true; Talk.show(st, () => startNode(st + 1)); return; }
   if (inBonus || !mapRun) { showMap(); return; }
   if (stage >= FINAL_STAGE) {                      // エンドレスは続けて次の面へ
@@ -4172,7 +4279,7 @@ document.getElementById("btnNext").addEventListener("click", () => {
 });
 document.getElementById("btnMapClear").addEventListener("click", showMap);
 document.getElementById("btnContinue").addEventListener("click", () => { best = loadBest(); continueSaved(); });
-document.getElementById("btnRetryStage").addEventListener("click", () => { if (mapRun) startNode(mapRun.node); else showMap(); });
+document.getElementById("btnRetryStage").addEventListener("click", () => { if (Team.take()) return; if (mapRun) startNode(mapRun.node); else showMap(); });
 document.getElementById("btnRetry").addEventListener("click", showMap);
 document.getElementById("btnAgain").addEventListener("click", showMap);
 document.getElementById("btnEndless").addEventListener("click", () => startNode("ex"));
@@ -4474,7 +4581,7 @@ function startNode(n) {
   }
   const st = n === "ex" ? FINAL_STAGE + 1 : n;
   const e = entryOf(st);
-  let army = e.army, power = e.power, boost = null;
+  let army = Order.army > 0 ? Order.army : e.army, power = e.power, boost = null;
   if (MAP.boost) {
     boost = MAP.boost;
     army = Math.round(army * boost.k);
@@ -4905,11 +5012,249 @@ function frame(t) {
   requestAnimationFrame(frame);
 }
 
+
+/* ===== 3人組とAIに注文（イベント用）===== */
+const AI_MODEL = "claude-haiku-5-5";
+const ORDER_LABEL = { enemy: "敵の数（ばい）", speed: "進む速さ（ばい）", army: "最初の仲間の数（0=ふつう）", theme: "景色",
+  bgm: "音楽", hero: "隊長の大きさ（ばい）", food: "長崎のアイテムの量（0〜3）", giant: "巨人が出る" };
+const ORDER_THEMES = { meganebashi: "眼鏡橋の朝", dejima: "夕焼けの出島", inasayama: "稲佐山の夜景", gunkanjima: "軍艦島の夕日",
+  glover: "天空のグラバー園", lantern: "ランタンの夜", kunchi: "くんちの秋", tram: "坂の街と路面電車" };
+const ORDER_BGMS = { valley: "明るい行進曲", desert: "ふしぎな曲", snow: "しずかな曲", volcano: "はげしい曲", sky: "空の曲", bonus: "お宝の曲" };
+const ORDER_CHIPS = ["敵を2倍にして", "夜にして", "隊長を大きくして", "カステラをいっぱいにして", "はげしい音楽にして", "巨人をなしにして", "ゆっくりにして", "仲間を500人にして"];
+
+/** 範囲の外の値・知らない値を捨てる（AIの答えも、おてほんの答えも、ここを通す） */
+function cleanOrder(ch) {
+  const out = {}, num = (v, lo, hi) => (typeof v === "number" && isFinite(v) ? Math.max(lo, Math.min(hi, Math.round(v * 100) / 100)) : null);
+  if (!ch || typeof ch !== "object") return out;
+  if ("enemy" in ch && num(ch.enemy, 0.2, 5) != null) out.enemy = num(ch.enemy, 0.2, 5);
+  if ("speed" in ch && num(ch.speed, 0.5, 2) != null) out.speed = num(ch.speed, 0.5, 2);
+  if ("army" in ch && num(ch.army, 0, 2000) != null) out.army = Math.round(num(ch.army, 0, 2000));
+  if ("hero" in ch && num(ch.hero, 0.6, 2.5) != null) out.hero = num(ch.hero, 0.6, 2.5);
+  if ("food" in ch && num(ch.food, 0, 3) != null) out.food = Math.round(num(ch.food, 0, 3));
+  if ("giant" in ch && typeof ch.giant === "boolean") out.giant = ch.giant;
+  if ("theme" in ch && (ch.theme === "" || ORDER_THEMES[ch.theme])) out.theme = ch.theme;
+  if ("bgm" in ch && (ch.bgm === "" || ORDER_BGMS[ch.bgm])) out.bgm = ch.bgm;
+  return out;
+}
+
+/** おてほんモード：ことばの手がかりで設定を変える（回線が無いとき・APIキーが無いとき） */
+function orderOffline(raw, cur) {
+  const t = String(raw || "").replace(/[０-９．]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xFEE0));
+  const ch = {}, say = [];
+  const KN = { "二": 2, "三": 3, "四": 4, "五": 5, "十": 10, "百": 100 };
+  const m1 = t.match(/(\d+(?:\.\d+)?)\s*(倍|ばい)/), m2 = t.match(/([二三四五十百])\s*(倍|ばい)/);
+  const mul = m1 ? +m1[1] : m2 ? KN[m2[1]] : 0;
+  const few = /少な|すくな|減ら|へら|よわ|弱/.test(t);
+  const none = /なし|無し|いらない|消して|けして|出さない|ださない|やめ/.test(t);
+  if (/敵|てき|モンスター|わるもの|悪者/.test(t)) {
+    ch.enemy = few || none ? cur.enemy / 2 : cur.enemy * (mul || 2);
+    say.push(ch.enemy > cur.enemy ? "敵を" + Math.round(ch.enemy / cur.enemy) + "倍にした" : "敵をへらした");
+  }
+  if (/巨人|きょじん|ボス/.test(t)) { ch.giant = !none; say.push(none ? "巨人をなしにした" : "巨人を出すようにした"); }
+  if (/ゆっくり|遅|おそく|のろ/.test(t)) { ch.speed = cur.speed * 0.7; say.push("ゆっくりにした"); }
+  else if (/速|はやく|スピード|ダッシュ/.test(t)) { ch.speed = cur.speed * 1.5; say.push("速くした"); }
+  const hm = /隊長|たいちょう|ぼく|わたし|自分|じぶん|キャラ/.test(t);
+  if (hm && /大き|おおき|でか|巨大|きょだい/.test(t)) { ch.hero = cur.hero * 1.5; say.push("隊長を大きくした"); }
+  else if (hm && /小さ|ちいさ/.test(t)) { ch.hero = cur.hero * 0.7; say.push("隊長を小さくした"); }
+  if (/仲間|なかま|兵|味方|みかた|軍/.test(t)) {
+    const m = t.match(/(\d+)\s*(人|にん|体|匹|ひき)?/);
+    ch.army = m ? +m[1] : few ? 10 : (mul ? 50 * mul : 300);
+    say.push("最初の仲間を" + Math.min(2000, ch.army) + "人にした");
+  }
+  if (/カステラ|ちゃんぽん|皿うどん|角煮|トルコライス|ミルクセーキ|食べ|たべ|アイテム|お菓子|おかし|ごはん/.test(t)) {
+    ch.food = none ? 0 : few ? 1 : 3; say.push(ch.food ? "長崎のアイテムをふやした" : "アイテムをなしにした");
+  }
+  const TH = [[/夜|よる|夜景|やけい|稲佐|いなさ/, "inasayama"], [/夕|ゆうやけ|出島|でじま/, "dejima"], [/ランタン|祭|まつり|赤/, "lantern"],
+    [/くんち|秋|あき/, "kunchi"], [/電車|でんしゃ|坂|さか/, "tram"], [/軍艦|ぐんかん|島|しま/, "gunkanjima"],
+    [/眼鏡|めがね|橋|はし|朝|あさ/, "meganebashi"], [/グラバー|空|そら|天空/, "glover"]];
+  if (!/音楽|おんがく|曲|きょく|BGM|歌|うた/.test(t)) for (const [re, k] of TH) if (re.test(t)) { ch.theme = k; say.push(ORDER_THEMES[k] + "にした"); break; }
+  if (/音楽|おんがく|曲|きょく|BGM|歌|うた|音/.test(t)) {
+    const b = /はげし|激し|ロック|かっこ|強/.test(t) ? "volcano" : /しずか|静か|やさし|ねむ/.test(t) ? "snow" : /ふしぎ|不思議|こわ/.test(t) ? "desert"
+      : /お宝|たから|楽し|たのし|ノリ/.test(t) ? "bonus" : /空|そら/.test(t) ? "sky" : "valley";
+    ch.bgm = b; say.push("音楽を「" + ORDER_BGMS[b] + "」にした");
+  }
+  const c = cleanOrder(ch);
+  if (!Object.keys(c).length) return null;
+  return { changes: c, say: say.join("、") + "よ！" };
+}
+
+/** AI（Claude）に、注文を設定の書きかえに直してもらう。つながらないときは null（おてほんモードに切り替える） */
+async function orderAI(text, cur) {
+  let key = ""; try { key = localStorage.getItem("evcfg:apikey") || ""; } catch (e) {}
+  if (!key || !navigator.onLine) return null;
+  const sys = "あなたは子ども向けゲーム「長崎クエスト」の設定係です。小学生・中学生の注文を読み、ゲームの設定をどう変えるかをJSONだけで答えます。\n" +
+    "設定（かっこ内は範囲）：enemy=敵の数の倍率(0.2〜5)、speed=進む速さの倍率(0.5〜2)、army=最初の仲間の数(0はふつう、〜2000)、" +
+    "hero=隊長の絵の大きさの倍率(0.6〜2.5)、food=道に落ちている長崎の食べもの(カステラ等)の量(0なし,1ふつう,2多い,3すごく多い)、giant=巨人を出すか(true/false)、" +
+    "theme=景色(" + Object.entries(ORDER_THEMES).map(([k, v]) => k + "=" + v).join(", ") + "、\"\"は面ごとの景色)、" +
+    "bgm=音楽(" + Object.entries(ORDER_BGMS).map(([k, v]) => k + "=" + v).join(", ") + "、\"\"は面ごとの曲)。\n" +
+    "倍・もっと・少し などは、いまの設定からの変化として数を決めてください。設定で表せない注文（3Dにして等）は changes を空にして、できないことをやさしく伝えます。\n" +
+    "答えの形：{\"changes\":{変える設定だけ},\"say\":\"子どもへのひとこと（ひらがな多め・40字以内・敬語なし）\"}";
+  const ctrl = new AbortController(), tm = setTimeout(() => ctrl.abort(), 9000);
+  try {
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST", signal: ctrl.signal,
+      headers: { "content-type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
+      body: JSON.stringify({ model: AI_MODEL, max_tokens: 300, system: sys,
+        messages: [{ role: "user", content: "いまの設定：" + JSON.stringify(cur) + "\n注文：" + text }] }),
+    });
+    if (!r.ok) return null;
+    const j = await r.json();
+    const s = (j.content || []).map((c) => c.text || "").join("");
+    const m = s.match(/\{[\s\S]*\}/); if (!m) return null;
+    const o = JSON.parse(m[0]);
+    return { changes: cleanOrder(o.changes), say: String(o.say || "").slice(0, 60), ai: true };
+  } catch (e) { return null; } finally { clearTimeout(tm); }
+}
+
+const fmtOrderVal = (k, v) => k === "theme" ? (v ? '"' + ORDER_THEMES[v] + '"' : '"面ごと"') : k === "bgm" ? (v ? '"' + ORDER_BGMS[v] + '"' : '"面ごと"') : String(v);
+
+const OrderUI = (() => {
+  const ov = document.getElementById("ovOrder"), who = document.getElementById("ordWho"), input = document.getElementById("ordText");
+  const bSend = document.getElementById("ordSend"), bGo = document.getElementById("ordGo"), bMic = document.getElementById("ordMic");
+  const res = document.getElementById("ordResult"), say = document.getElementById("ordSay"), code = document.getElementById("ordCode");
+  const mode = document.getElementById("ordMode"), keyIn = document.getElementById("ordKey");
+  let after = null, name = "", busy = false;
+  const hasKey = () => { try { return !!localStorage.getItem("evcfg:apikey"); } catch (e) { return false; } };
+  function paintMode(extra) { mode.textContent = (hasKey() ? "AI：Claude（" + AI_MODEL + "）" : "AI：おてほんモード（ことばの手がかりで書きかえ）") + (extra ? " ─ " + extra : ""); }
+  const chips = document.getElementById("ordChips");
+  ORDER_CHIPS.forEach((c) => { const b = document.createElement("button"); b.type = "button"; b.textContent = c; b.onclick = () => { input.value = c; send(); }; chips.appendChild(b); });
+  function open(opt) {
+    name = opt.name || ""; after = opt.after || null;
+    who.textContent = name ? name + "隊長の注文" : "AIに注文";
+    bGo.textContent = opt.go || "この注文で出撃";
+    input.value = ""; res.hidden = true; paintMode();
+    ["ovTitle", "ovClear", "ovOver", "ovMap", "ovTurn"].forEach((id) => { const el = document.getElementById(id); if (el) el.hidden = true; });
+    ov.hidden = false;
+    setTimeout(() => input.focus(), 50);
+  }
+  async function send() {
+    const text = input.value.trim();
+    if (!text || busy) return;
+    busy = true; bSend.disabled = true; bSend.textContent = "AIが考えています…";
+    const cur = Order.all();
+    let r = await orderAI(text, cur), note = "";
+    if (!r) { if (hasKey()) note = "AIにつながらなかったので、おてほんモードで書きかえた"; r = orderOffline(text, cur); }
+    busy = false; bSend.disabled = false; bSend.textContent = "AIにたのむ";
+    res.hidden = false;
+    if (!r || !Object.keys(r.changes).length) {
+      say.textContent = (r && r.say) || "ごめんね、その注文はまだできないよ。ほかの注文をしてみてね";
+      code.textContent = "// 書きかえた設定はありません";
+      paintMode(note); return;
+    }
+    const next = Object.assign(cur, r.changes);
+    Order.set(next);
+    say.textContent = r.say || "書きかえたよ！";
+    code.textContent = Object.keys(r.changes).map((k) => k + " = " + fmtOrderVal(k, r.changes[k]) + ";   // " + ORDER_LABEL[k]).join("\n");
+    try {
+      const log = JSON.parse(localStorage.getItem("ev:order.log") || "[]");
+      log.push({ name, text, say: say.textContent });
+      localStorage.setItem("ev:order.log", JSON.stringify(log.slice(-12)));
+    } catch (e) {}
+    paintMode(note);
+  }
+  bSend.addEventListener("click", send);
+  input.addEventListener("keydown", (e) => { if (e.key === "Enter") send(); });
+  bGo.addEventListener("click", () => { ov.hidden = true; const f = after; after = null; if (f) f(); else ovTitle.hidden = false; });
+  // 声で注文（Chrome の音声認識。使えない端末ではボタンを出さない）
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) bMic.hidden = true;
+  else bMic.addEventListener("click", () => {
+    const rec = new SR(); rec.lang = "ja-JP"; rec.interimResults = true; rec.maxAlternatives = 1;
+    bMic.classList.add("ord-mic-on"); bMic.textContent = "きいてるよ";
+    rec.onresult = (e) => { input.value = Array.from(e.results).map((x) => x[0].transcript).join(""); };
+    rec.onend = () => { bMic.classList.remove("ord-mic-on"); bMic.textContent = "話す"; if (input.value.trim()) send(); };
+    rec.onerror = () => { bMic.classList.remove("ord-mic-on"); bMic.textContent = "話す"; };
+    try { rec.start(); } catch (e) {}
+  });
+  document.getElementById("ordKeySave").addEventListener("click", () => {
+    try { const v = keyIn.value.trim(); if (v) localStorage.setItem("evcfg:apikey", v); else localStorage.removeItem("evcfg:apikey"); } catch (e) {}
+    keyIn.value = ""; paintMode(hasKey() ? "キーを保存した" : "おてほんモードにした");
+  });
+  document.getElementById("ordReset").addEventListener("click", () => {
+    Order.set(Object.assign({}, ORDER_DEFAULT)); try { localStorage.removeItem("ev:order.log"); } catch (e) {}
+    res.hidden = false; say.textContent = "注文を、ぜんぶ元にもどした"; code.textContent = "";
+  });
+  return { open };
+})();
+
+const Team = (() => {
+  const rd = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : v; } catch (e) { return d; } };
+  let team = []; try { team = JSON.parse(rd("ev:team", "[]")) || []; } catch (e) {}
+  const n = team.length, on = n >= 2;
+  let turn = Math.min(n - 1, Math.max(0, parseInt(rd("ev:turn", "0"), 10) || 0)), phase = rd("ev:phase", "play");
+  const nm = (i) => (team[i] && team[i].name ? team[i].name : (i + 1) + "人目の");
+  /** 次へ進むボタンの文字（null なら3人組の流れは終わり・ふつうに遊ぶ） */
+  function label() {
+    if (!on || phase === "done") return null;
+    if (phase === "play") return turn + 1 < n ? "つぎは " + nm(turn + 1) + "隊長の番" : "みんなでAIに注文しよう";
+    return turn + 1 < n ? "つぎは " + nm(turn + 1) + "隊長の注文" : "ゲーム完成！";
+  }
+  const KEEP = ["ev:team", "ev:turn", "ev:phase", "ev:hero", "ev:hero.name", "ev:story.seen", "ev:story.mute", "ev:order", "ev:order.log", "ev:auto"];
+  function advance() {
+    if (phase === "play") { if (turn + 1 < n) turn++; else { phase = "order"; turn = 0; } }
+    else if (turn + 1 < n) turn++;
+    else { phase = "done"; try { localStorage.setItem("ev:phase", "done"); } catch (e) {} showDone(); return; }
+    try {
+      // 前の子の続き・記録は消す（3人とも1面から）。チーム・注文・紙芝居を見たかは残す
+      const ks = []; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.indexOf("ev:") === 0 && KEEP.indexOf(k) < 0) ks.push(k); }
+      ks.forEach((k) => localStorage.removeItem(k));
+      localStorage.setItem("ev:turn", String(turn)); localStorage.setItem("ev:phase", phase);
+      localStorage.setItem("ev:hero", team[turn].url); localStorage.setItem("ev:hero.name", team[turn].name || "");
+      localStorage.setItem("ev:auto", "1");
+    } catch (e) {}
+    location.reload();
+  }
+  /** 結果画面のボタンを3人組用に。押したら true（ふつうの動きを止める） */
+  function take() { if (!label()) return false; advance(); return true; }
+  function decorate(kind) {
+    const l = label();
+    const bOrder = document.getElementById("btnOrderClear");
+    if (kind === "clear") {
+      if (l) { document.getElementById("btnNext").textContent = l; document.getElementById("btnMapClear").hidden = true; }
+      bOrder.hidden = !!l;
+    } else {
+      document.getElementById("btnRetryStage").textContent = l || "もう一度";
+      document.getElementById("btnRetry").hidden = !!l;
+    }
+  }
+  function showDone() {
+    const list = document.getElementById("doneList"); list.innerHTML = "";
+    let log = []; try { log = JSON.parse(localStorage.getItem("ev:order.log") || "[]"); } catch (e) {}
+    log.forEach((x) => { const li = document.createElement("li"); li.textContent = (x.name ? x.name + "隊長：" : "") + "「" + x.text + "」"; list.appendChild(li); });
+    if (!log.length) { const li = document.createElement("li"); li.textContent = "注文はなかったよ。つぎはAIにたのんでみてね"; list.appendChild(li); }
+    ["ovClear", "ovOver", "ovWin"].forEach((id) => { document.getElementById(id).hidden = true; });
+    document.getElementById("ovDone").hidden = false;
+  }
+  /** 読み込み直したあと：今の番の子の出撃カード、または注文の画面を出す（音を鳴らすため、出撃はボタンを押してから） */
+  function autostart() {
+    if (!on || rd("ev:auto", "") !== "1") return;
+    try { localStorage.removeItem("ev:auto"); } catch (e) {}
+    ovTitle.hidden = true;
+    if (phase === "order") { OrderUI.open({ name: team[turn].name, after: () => startNode(1) }); return; }
+    document.getElementById("turnEyebrow").textContent = (turn + 1) + "人目 / " + n + "人";
+    document.getElementById("turnPic").src = team[turn].url;
+    document.getElementById("turnName").textContent = nm(turn) + "隊長の番！";
+    document.getElementById("ovTurn").hidden = false;
+  }
+  document.getElementById("turnGo").addEventListener("click", () => { document.getElementById("ovTurn").hidden = true; startNode(1); });
+  document.getElementById("doneNext").addEventListener("click", () => { location.href = "index.html"; });
+  document.getElementById("doneMore").addEventListener("click", () => { document.getElementById("ovDone").hidden = true; showMap(); });
+  document.getElementById("btnOrder").addEventListener("click", () => OrderUI.open({ name: HERO_NAME, after: showMap, go: "この注文でマップへ" }));
+  document.getElementById("btnOrderClear").addEventListener("click", () => {
+    const node = mapRun ? mapRun.node : 1;
+    OrderUI.open({ name: HERO_NAME, after: () => startNode(node), go: "この注文でもう一度" });
+  });
+  return { on, take, decorate, autostart };
+})();
+/* 動作確認用（?evdebug のときだけ、外から面のクリア・全滅を起こせる） */
+if (location.search.includes("evdebug")) window.__ev = { startNode, stageClear, gameOver, Order, setCount, st: () => ({ state, stage, speed: crowd.speed, count: crowd.count }) };
+
 function boot() {
   resize();
   best = loadBest();
   setupDemo();
   refreshTitle();
+  Team.autostart();
   requestAnimationFrame(frame);
   setTimeout(() => STAGE_THEMES.forEach(bgImage), 3000);   // 景色5枚を少し遅れて先読み（ステージを飛んでも絵が間に合う）
 }
